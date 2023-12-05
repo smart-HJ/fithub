@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fithub.smart.model.dao.CommentDao">
+	
+	<select id="commentList" resultType="Comment">
+		select *
+		from comment c
+		LEFT OUTER JOIN user u ON c.userId = u.userId
+		where boardId = #{boardId}
+		ORDER BY c.commentGroup, c.regDate
+	</select>
+
+	<insert id="registComment" parameterType="Comment">
+		INSERT INTO comment (boardId, userId, content, commentGroup, cocomment)
+		VALUES (#{boardId}, #{userId}, #{content}, #{commentGroup}, #{cocomment})
+	</insert>
+	
+	<delete id="deleteComment">
+		DELETE FROM	comment
+		<if test='cocomment == "N"'>
+			where boardId = #{boardId}
+			and commentGroup = #{commentGroup}
+		</if>
+		<if test='cocomment == "Y"'>
+			where commentId = #{commentId}
+		</if>
+	</delete>
+
+
+</mapper>

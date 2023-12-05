@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fithub.smart.model.dao.MyPageDao">
+	<select id="getMyLessons">
+		select * from reservation a LEFT OUTER JOIN lesson b
+		on
+		a.lessonId=b.lessonId where userId=#{userId}
+	</select>
+
+
+	<select id="oneDayLessons" parameterType="SelectLessonDto"
+		resultType="Lesson">
+		select * from reservation a LEFT OUTER JOIN lesson b on
+		a.lessonId=b.lessonId where userId=#{userId} and b.date=#{date1}
+	</select>
+	
+	<select id="getMyBoards" parameterType="int">
+		SELECT *, b.img as profileImg, (select count(*) from boardlike c where a.boardId = c.boardId) likeCnt
+		FROM board a
+		LEFT OUTER JOIN user b
+		ON a.userId = b.userId
+		WHERE a.userId = #{userId}
+		ORDER BY a.regDate desc
+	</select>
+	
+	<update id="updateUser" parameterType="User">
+		UPDATE user
+		SET id = #{id}, 
+		<if test="img != null">
+			img = #{img}
+		</if>
+		WHERE userId = #{userId}
+	</update>
+	
+	<update id="changePassword" parameterType="User">
+		UPDATE user set password= #{password} where userId=#{userId}
+	</update>
+</mapper>

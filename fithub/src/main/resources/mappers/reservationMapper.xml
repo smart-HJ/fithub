@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fithub.smart.model.dao.ReservationDao">
+
+	<select id="lessonList" resultType="Lesson"
+		parameterType="SelectLessonDto">
+		SELECT *
+		FROM lesson l
+		LEFT OUTER JOIN place p
+		ON l.placeId = p.placeId
+		WHERE p.placeName = #{placeName}
+		AND l.date = #{date1}
+	</select>
+	
+	<select id="isRes" parameterType="Reservation" resultType="int">
+		select Count(*) from reservation where userId=#{userId} and
+		lessonId=#{lessonId}
+	</select>
+	
+	<select id="resCnt" parameterType="int" resultType="int">
+		select Count(*) from reservation where lessonId=#{lessonId}
+	</select>
+	
+    <delete id="deleteRes" parameterType="Reservation">
+        delete from reservation where userId=#{userId} and lessonId=#{lessonId}
+    </delete>
+	
+	
+	<insert id="reservationPay" parameterType="Reservation">
+		INSERT INTO reservation
+		VALUES (#{lessonId}, #{userId})
+	</insert>
+
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fithub.smart.model.dao.BoardDao">
+
+	<select id="boardList" resultType="Board">
+		SELECT *, b.img as profileImg, (select count(*) from boardlike c where a.boardId = c.boardId) likeCnt,
+			(select count(*) from comment c where a.boardId = c.boardId) commentCnt
+		FROM board a
+		LEFT OUTER JOIN user b
+		ON a.userId = b.userId
+	</select>
+	
+	<select id="boardDetail" parameterType="Like" resultType="Board">
+        select
+        	*,b.img as profileImg, (select count(*) from boardlike c where a.boardId = c.boardId)
+        	likeCnt ,
+        	(select count(*) from boardlike c where a.boardId = c.boardId and c.userId = #{userId}) islike,
+        	(select count(*) from comment c where a.boardId = c.boardId) commentCnt
+        from board a
+        LEFT JOIN user b
+        ON a.userId = b.userId
+        WHERE boardId = #{boardId}
+    </select>
+	
+	<insert id="boardRegist" parameterType="Board"
+        keyProperty="boardId" useGeneratedKeys="true">
+        insert into
+        board(userId,content,img)
+        values(#{userId},#{content},#{img})
+    </insert>
+	
+    <insert id="hashTagRegist" parameterType="HashTag">
+    	insert into hashtag
+    	values (#{boardId}, #{hashtag})
+    </insert>
+	
+	<select id="getUserId" parameterType="String" resultType="int">
+		select userId from user where id=#{id}
+	</select>
+	
+	<delete id="boardDelete" parameterType="int">
+	delete from board where boardId=#{id}
+	</delete>
+	
+	<update id="boardUpdate" parameterType="Board" >
+	update board set content=#{content} where boardId=#{boardId}
+	</update>
+
+	<select id="boardSearch" parameterType="String"
+        resultType="Board">
+        SELECT *, b.img as profileImg,
+        (SELECT COUNT(*) FROM boardlike c WHERE a.boardId = c.boardId) as likeCnt,
+        (select count(*) from comment c where a.boardId = c.boardId) commentCnt
+        FROM board a
+        LEFT OUTER JOIN user b ON a.userId = b.userId
+        WHERE a.boardId IN (SELECT boardId FROM hashtag WHERE hashtag = #{tag})
+    </select>
+    
+    <!--게시글디테일해시태그 출력-->
+    <select id="boardHashTags" parameterType="int" resultType="String">
+        select distinct hashtag from hashtag where boardId=#{boardId}
+    </select>
+    
+    <delete id="hashTagClear" parameterType="int">
+    	DELETE FROM hashtag
+    	WHERE boardId = #{boardId}
+    </delete>
+
+</mapper>
